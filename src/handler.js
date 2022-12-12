@@ -72,7 +72,9 @@ const addBookHandler = (request, h) => {
   }
 };
 
-const getAllBooksHandler = () => {
+const getAllBooksHandler = (request, h) => {
+  const { reading, finished, name } = request.query;
+
   if (books.length > 0) {
     const bookFiltered = [];
     for (let i = 0; i < books.length; i++) {
@@ -92,7 +94,7 @@ const getAllBooksHandler = () => {
     return {
       status: 'success',
       data: {
-        books,
+        books: [],
       },
     };
   }
@@ -116,7 +118,7 @@ const getBookByIdHandler = (request, h) => {
     status: 'fail',
     message: 'Buku tidak ditemukan',
   });
-  response.code(400);
+  response.code(404);
   return response;
 };
 
@@ -201,7 +203,7 @@ const deleteBookByIdHandler = (request, h) => {
 
   const response = h.response({
     status: 'fail',
-    message: 'Catatan gagal dihapus. Id tidak ditemukan',
+    message: 'Buku gagal dihapus. Id tidak ditemukan',
   });
   response.code(404);
   return response;
