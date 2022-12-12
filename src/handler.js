@@ -1,5 +1,5 @@
 const { nanoid } = require('nanoid');
-const bookshelf = require('./bookshelf');
+const books = require('./books');
 
 const addBookHandler = (request, h) => {
   const {
@@ -33,22 +33,14 @@ const addBookHandler = (request, h) => {
     updatedAt,
   };
 
-  bookshelf.push(newBook);
-
-  const noName = newBook.name === '';
-  const strangePage = newBook.readPage > newBook.pageCount;
-  const isSuccess = bookshelf.filter((book) => book.id === id).length > 0;
-
-  if (noName) {
+  if (!name) {
     const response = h.response({
       status: 'fail',
       message: 'Gagal menambahkan buku. Mohon isi nama buku',
     });
     response.code(400);
     return response;
-  }
-
-  if (strangePage) {
+  } else if (readPage > pageCount) {
     const response = h.response({
       status: 'fail',
       message:
@@ -56,26 +48,54 @@ const addBookHandler = (request, h) => {
     });
     response.code(400);
     return response;
+  } else {
+    books.push(newBook);
+    const isSuccess = books.filter((book) => book.id === id).length > 0;
+    if (isSuccess) {
+      const response = h.response({
+        status: 'success',
+        message: 'Buku berhasil ditambahkan',
+        data: {
+          bookId: id,
+        },
+      });
+      response.code(201);
+      return response;
+    } else {
+      const response = h.reponse({
+        status: 'fail',
+        message: 'Buku gagal ditambahkan',
+      });
+      response.code(500);
+      return response;
+    }
   }
-
-  if (isSuccess) {
-    const response = h.response({
-      status: 'success',
-      message: 'Buku berhasil ditambahkan',
-      data: {
-        bookId: id,
-      },
-    });
-    response.code(201);
-    return response;
-  }
-
-  const response = h.reponse({
-    status: 'fail',
-    message: 'Buku gagal ditambahkan',
-  });
-  response.code(500);
-  return response;
 };
 
-module.exports = { addBookHandler };
+const getAllBooksHandler = () => {
+  if (books.length > 0) {
+    const bookFiltered = [];
+    for (let i = 0; i < books.length; i++) {
+      bookFiltered.push({
+        id: books[i].id,
+        name: books[i].name,
+        publisher: books[i].publisher,
+      });
+    }
+    return {
+      status: 'success',
+      data: {
+        books: bookFiltered,
+      },
+    };
+  } else {
+    return {
+      status: 'success',
+      data: {
+        books,
+      },
+    };
+  }
+};
+
+module.exports = { addBookHandler, getAllBooksHandler };
