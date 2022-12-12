@@ -75,29 +75,120 @@ const addBookHandler = (request, h) => {
 const getAllBooksHandler = (request, h) => {
   const { reading, finished, name } = request.query;
 
-  if (books.length > 0) {
-    const bookFiltered = [];
-    for (let i = 0; i < books.length; i++) {
-      bookFiltered.push({
-        id: books[i].id,
-        name: books[i].name,
-        publisher: books[i].publisher,
-      });
-    }
-    return {
-      status: 'success',
-      data: {
-        books: bookFiltered,
-      },
-    };
-  } else {
+  if (books.length === 0) {
     return {
       status: 'success',
       data: {
         books: [],
       },
     };
+  } else if (name) {
+    const filteredNamedBook = [];
+    const namedBook = books.filter((book) => book.name.toLowerCase().includes(name.toLowerCase()));
+
+    for (let i = 0; i < namedBook.length; i++) {
+      filteredNamedBook.push({
+        id: namedBook[i].id,
+        name: namedBook[i].name,
+        publisher: namedBook[i].publisher,
+      });
+    }
+
+    return {
+      status: 'success',
+      data: {
+        books: filteredNamedBook,
+      },
+    };
+  } else if (reading) {
+    if (reading === '1') {
+      const readBook = [];
+      for (let i = 0; i < books.length; i++) {
+        if (books[i].reading === true) {
+          readBook.push({
+            id: books[i].id,
+            name: books[i].name,
+            publisher: books[i].publisher,
+          });
+        }
+      }
+      return {
+        status: 'success',
+        data: {
+          books: readBook,
+        },
+      };
+    } else if (reading === '0') {
+      const unreadBook = [];
+      for (let i = 0; i < books.length; i++) {
+        if (books[i].reading === false) {
+          unreadBook.push({
+            id: books[i].id,
+            name: books[i].name,
+            publisher: books[i].publisher,
+          });
+        }
+      }
+      return {
+        status: 'success',
+        data: {
+          books: unreadBook,
+        },
+      };
+    }
+  } else if (finished) {
+    if (finished === '1') {
+      const finishedBook = [];
+      for (let i = 0; i < books.length; i++) {
+        if (books[i].finished === true) {
+          finishedBook.push({
+            id: books[i].id,
+            name: books[i].name,
+            publisher: books[i].publisher,
+          });
+        }
+      }
+      return {
+        status: 'success',
+        data: {
+          books: finishedBook,
+        },
+      };
+    } else if (finished === '0') {
+      const unfinishedBook = [];
+      for (let i = 0; i < books.length; i++) {
+        if (books[i].finished === false) {
+          unfinishedBook.push({
+            id: books[i].id,
+            name: books[i].name,
+            publisher: books[i].publisher,
+          });
+        }
+      }
+      return {
+        status: 'success',
+        data: {
+          books: unfinishedBook,
+        },
+      };
+    }
   }
+
+  const filteredBook = [];
+  for (let i = 0; i < books.length; i++) {
+    filteredBook.push({
+      id: books[i].id,
+      name: books[i].name,
+      publisher: books[i].publisher,
+    });
+  }
+
+  return {
+    status: 'success',
+    data: {
+      books: filteredBook,
+    },
+  };
 };
 
 const getBookByIdHandler = (request, h) => {
